@@ -1,0 +1,82 @@
+# task_manager.py
+
+import json
+import os
+
+DATA_FILE = "tasks.json"
+
+def load_data():
+    """Memuat data tugas dari file JSON."""
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, 'r') as f:
+            return json.load(f)
+    return {"tasks": [], "routines": [
+        "Bangun pagi, minum air.",
+        "Sarapan.",
+        "Periksa email atau jadwal sekolah.",
+        "Siapkan materi pelajaran/pekerjaan.",
+        "Olahraga ringan."
+    ]}
+
+def save_data(data):
+    """Menyimpan data tugas ke file JSON."""
+    with open(DATA_FILE, 'w') as f:
+        json.dump(data, f, indent=4)
+
+def tambah_tugas(data, description):
+    """Menambahkan tugas baru."""
+    task_id = len(data['tasks']) + 1
+    data['tasks'].append({
+        'id': task_id,
+        'desc': description,
+        'completed': False
+    })
+    save_data(data)
+    print(f"✅ Tugas '{description}' berhasil ditambahkan.")
+
+def lihat_tugas(data):
+    """Menampilkan tugas yang belum selesai."""
+    pending_tasks = [t for t in data['tasks'] if not t['completed']]
+    if not pending_tasks:
+        print("🎉 Semua tugas selesai! Tidak ada tugas yang tertunda.")
+        return
+
+    print("\n--- DAFTAR TUGAS TERTUNDA ---")
+    for task in pending_tasks:
+        print(f"[{task['id']}] {task['desc']}")
+    print("-----------------------------\n")
+
+def lihat_rutinitas(data):
+    """Menampilkan rutinitas harian."""
+    print("\n--- RUTINITAS HARIAN ---")
+    for i, routine in enumerate(data['routines']):
+        print(f"{i+1}. {routine}")
+    print("------------------------\n")
+
+# ... (Tambahkan fungsi untuk 'selesai' dan 'hapus') ...
+
+def main():
+    """Fungsi utama program."""
+    data = load_data()
+    print("Selamat datang di Daily Routine and Task Manager (DRTM)!")
+    
+    while True:
+        command = input("Masukkan perintah (tambah, lihat, rutinitas, selesai <nomor>, keluar): ").lower().strip()
+        parts = command.split(' ', 1)
+        action = parts[0]
+        
+        if action == 'keluar':
+            print("Terima kasih, sampai jumpa! 👋")
+            break
+        elif action == 'tambah' and len(parts) > 1:
+            tambah_tugas(data, parts[1])
+        elif action == 'lihat':
+            lihat_tugas(data)
+        elif action == 'rutinitas':
+            lihat_rutinitas(data)
+        # ... (Logika untuk 'selesai' dan 'hapus' diimplementasikan di sini) ...
+        else:
+            print("Perintah tidak valid atau format salah. Silakan coba lagi.")
+
+if _name_ == "_main_":
+    main()
